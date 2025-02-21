@@ -20,6 +20,11 @@ const NoteCard = ({ note }) => {
         pathname: "/EditVoiceNote",
         params: { note: JSON.stringify(note) },
       });
+    } else if (note.type === "image") {
+      navigation.push({
+        pathname: "/EditImageNote",
+        params: { note: JSON.stringify(note) },
+      });
     } else {
       navigation.push({
         pathname: "/EditNote",

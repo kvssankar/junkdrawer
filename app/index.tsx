@@ -11,6 +11,7 @@ import { Searchbar, Chip, Card, FAB } from "react-native-paper";
 import moment from "moment";
 import NoteCard from "@/components/NoteCard";
 import VoiceNoteModal from "@/components/VoiceNoteModal";
+import CameraModal from "@/components/CameraModal";
 
 const HomeScreen = () => {
   const tags = ["All Tags", "Finance", "Health", "Learning", "sankar"];
@@ -27,6 +28,7 @@ const HomeScreen = () => {
 
   const [isTextModalVisible, setIsTextModalVisible] = useState(false);
   const [isVoiceModalVisible, setIsVoiceModalVisible] = useState(false);
+  const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
 
   const handleAddNote = (noteText) => {
     setNotes([
@@ -44,6 +46,18 @@ const HomeScreen = () => {
   const handleAddVoiceNote = (voiceNote) => {
     setNotes([voiceNote, ...notes]);
     setIsVoiceModalVisible(false);
+  };
+
+  const handleCaptureImage = (imageUri: string) => {
+    const newImageNote = {
+      title: "New Image Note",
+      content: "", // You may add description later
+      imageUri, // Save the image URI
+      tags: ["Image"],
+      date: new Date(),
+      type: "image", // Mark the note as an image note
+    };
+    setNotes([newImageNote, ...notes]);
   };
 
   return (
@@ -87,7 +101,12 @@ const HomeScreen = () => {
           small
           onPress={() => setIsVoiceModalVisible(true)}
         />
-        <FAB icon="image" style={styles.fab} small />
+        <FAB
+          icon="image"
+          style={styles.fab}
+          small
+          onPress={() => setIsCameraModalVisible(true)}
+        />
       </View>
 
       <AddNoteModal
@@ -99,6 +118,11 @@ const HomeScreen = () => {
         isVisible={isVoiceModalVisible}
         onClose={() => setIsVoiceModalVisible(false)}
         onSave={handleAddVoiceNote}
+      />
+      <CameraModal
+        isVisible={isCameraModalVisible}
+        onClose={() => setIsCameraModalVisible(false)}
+        onCapture={handleCaptureImage}
       />
     </View>
   );

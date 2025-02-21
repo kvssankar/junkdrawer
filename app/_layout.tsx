@@ -74,6 +74,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="EditNote" options={{ headerShown: false }} />
         <Stack.Screen name="EditVoiceNote" options={{ headerShown: false }} />
+        <Stack.Screen name="EditImageNote" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       {/* <StatusBar style="auto" /> */}

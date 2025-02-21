@@ -4,7 +4,6 @@ import { Card, Chip, Menu, IconButton } from "react-native-paper";
 import moment from "moment";
 import { useRouter } from "expo-router";
 
-// A component for an individual note card.
 const NoteCard = ({ note }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const navigation = useRouter();
@@ -42,11 +41,10 @@ const NoteCard = ({ note }) => {
   return (
     <Card style={styles.noteCard}>
       <Card.Title
-        titleStyle={{ fontSize: 14 }}
-        subtitleStyle={{ fontSize: 18, fontWeight: "700" }}
+        titleStyle={styles.cardDate}
+        subtitleStyle={styles.cardTitle}
         title={moment(note.date).calendar()}
         subtitle={note.title}
-        // The "right" prop lets you render a component at the top right.
         right={(props) => (
           <Menu
             visible={menuVisible}
@@ -61,10 +59,14 @@ const NoteCard = ({ note }) => {
         )}
       />
       <Card.Content>
-        <Text style={{ fontSize: 15 }}>{note.content}</Text>
+        <Text style={styles.noteContent}>{note.content}</Text>
         <View style={styles.noteTags}>
           {note.tags.map((tag, idx) => (
-            <Chip key={idx} style={styles.noteTag}>
+            <Chip
+              key={idx}
+              style={styles.noteTag}
+              textStyle={styles.noteTagText}
+            >
               {tag}
             </Chip>
           ))}
@@ -76,24 +78,50 @@ const NoteCard = ({ note }) => {
 
 const styles = {
   noteCard: {
-    backgroundColor: "white",
-    shadowColor: "transparent", // Removes iOS shadow
-    // Optionally, you can also reset other iOS shadow properties:
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0,
-    shadowRadius: 0,
-    elevation: 0,
+    backgroundColor: "#f9f9f9", // Light gray background
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4, // Android shadow
     marginBottom: 16,
-    borderRadius: 0,
+    marginHorizontal: 8,
+    borderRadius: 12, // Nicer border radius
+    borderColor: "#eaeaea",
+    borderWidth: 1,
+  },
+  cardDate: {
+    fontSize: 12,
+    color: "#777",
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 2,
+    color: "#333",
+  },
+  noteContent: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: "#444",
+    marginBottom: 10,
   },
   noteTags: {
     flexDirection: "row",
-    marginTop: 8,
+    flexWrap: "wrap",
+    marginTop: 10,
   },
   noteTag: {
     marginRight: 8,
-    borderRadius: 15,
+    marginBottom: 5,
+    borderRadius: 20,
     backgroundColor: "#f0f0f0",
+    borderColor: "#e0e0e0",
+    borderWidth: 0.5,
+  },
+  noteTagText: {
+    fontSize: 12,
+    color: "#666",
   },
 };
 

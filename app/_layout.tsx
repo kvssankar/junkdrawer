@@ -1,4 +1,4 @@
-import { Provider as PaperProvider } from "react-native-paper";
+import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import { MD3DarkTheme, MD3LightTheme } from "react-native-paper";
 import {
   useFonts,
@@ -66,10 +66,23 @@ export default function RootLayout() {
     return null;
   }
 
+  const theme = {
+    ...DefaultTheme,
+    fonts: {
+      bodyLarge: { fontFamily: "Poppins_400Regular", fontWeight: "normal" },
+      bodyMedium: { fontFamily: "Poppins_400Regular", fontWeight: "normal" },
+      bodySmall: { fontFamily: "Poppins_400Regular", fontWeight: "normal" },
+      labelLarge: { fontFamily: "Poppins_500Medium", fontWeight: "normal" },
+      labelMedium: { fontFamily: "Poppins_500Medium", fontWeight: "normal" },
+      labelSmall: { fontFamily: "Poppins_500Medium", fontWeight: "normal" },
+      titleLarge: { fontFamily: "Poppins_500Medium", fontWeight: "normal" },
+      titleMedium: { fontFamily: "Poppins_500Medium", fontWeight: "normal" },
+      titleSmall: { fontFamily: "Poppins_500Medium", fontWeight: "normal" },
+    },
+  };
+
   return (
-    <PaperProvider
-      theme={colorScheme === "dark" ? MD3DarkTheme : MD3LightTheme}
-    >
+    <PaperProvider theme={theme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="EditNote" options={{ headerShown: false }} />

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView } from "react-native";
-import { Card, Chip, Menu, IconButton } from "react-native-paper";
+import { View, ScrollView } from "react-native";
+import { Card, Text, Chip, Menu, IconButton } from "react-native-paper";
 import moment from "moment";
 import { useRouter } from "expo-router";
 
@@ -96,7 +96,8 @@ const styles = {
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: 500,
+    fontFamily: "Poppins_700Bold",
     marginTop: 2,
     color: "#333",
   },

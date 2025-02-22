@@ -66,13 +66,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     minHeight: 300,
-    fontFamily: "SpaceMono",
   },
   modalTitle: {
     fontSize: 22,
-    fontWeight: "600",
+    fontWeight: 600,
     marginBottom: 15,
-    fontFamily: "Poppins",
   },
   textInput: {
     height: 150,

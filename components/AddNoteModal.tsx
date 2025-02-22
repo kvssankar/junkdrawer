@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TextInput } from "react-native";
+import { View, StyleSheet, TextInput, Keyboard } from "react-native";
 import { Button, Text } from "react-native-paper";
 import Modal from "react-native-modal";
 
@@ -8,8 +8,14 @@ const AddNoteModal = ({ isVisible, onClose, onAdd }) => {
 
   const handleAddNote = () => {
     if (noteText.trim()) {
-      onAdd(noteText);
-      setNoteText("");
+      // Dismiss keyboard first
+      Keyboard.dismiss();
+
+      // Add a small delay before closing the modal
+      setTimeout(() => {
+        onAdd(noteText);
+        setNoteText("");
+      }, 100); // 100ms delay should be enough
     }
   };
 
@@ -18,8 +24,8 @@ const AddNoteModal = ({ isVisible, onClose, onAdd }) => {
       isVisible={isVisible}
       onBackdropPress={onClose}
       animationIn="slideInUp"
-      animationOut="slideOutDown"
-      backdropTransitionOutTiming={0}
+      // animationOut="bounceDown"
+      // backdropTransitionOutTiming={0}
       style={styles.modal}
     >
       <View style={styles.modalContent}>

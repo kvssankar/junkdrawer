@@ -62,6 +62,12 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
         isVisible={isVisible}
         onBackdropPress={onClose}
         style={styles.modal}
+        animationIn="fadeIn" // or "slideInUp"
+        animationOut="fadeOut" // or "slideOutDown"
+        animationInTiming={300}
+        animationOutTiming={300}
+        backdropTransitionInTiming={300}
+        backdropTransitionOutTiming={300}
       >
         <View style={styles.permissionContainer}>
           <Text style={styles.message}>Camera permission is required</Text>

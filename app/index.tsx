@@ -16,6 +16,7 @@ const HomeScreen = () => {
       content: "Shopping list and tasks...",
       tags: ["Family", "To do List"],
       date: new Date(),
+      type: "text",
     },
   ];
   const [notes, setNotes] = useState(n);
@@ -60,20 +61,29 @@ const HomeScreen = () => {
 
       <View style={styles.bottomActions}>
         <FAB
-          icon="text"
-          style={styles.fab}
-          small
-          onPress={() => setIsTextModalVisible(true)}
-        />
-        <FAB
           icon="microphone"
-          style={styles.fab}
+          style={[
+            styles.fab,
+            { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 },
+          ]}
+          color="white"
           small
           onPress={() => setIsVoiceModalVisible(true)}
         />
         <FAB
-          icon="image"
+          icon="text"
           style={styles.fab}
+          color="white"
+          small
+          onPress={() => setIsTextModalVisible(true)}
+        />
+        <FAB
+          icon="camera"
+          style={[
+            styles.fab,
+            { borderTopRightRadius: 20, borderBottomRightRadius: 20 },
+          ]}
+          color="white"
           small
           onPress={() => setIsCameraModalVisible(true)}
         />
@@ -89,6 +99,7 @@ const HomeScreen = () => {
               content: noteText,
               tags: ["New"],
               date: new Date(),
+              type: "text",
             },
             ...notes,
           ]);
@@ -156,9 +167,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 16,
     backgroundColor: "rgba(255, 255, 255, 1)",
+    borderRadius: 20,
   },
   fab: {
-    margin: 8,
+    // margin: 8,
+    borderRadius: 0,
+    backgroundColor: "rgb(69, 129, 240)",
+    color: "white",
     shadowColor: "transparent",
   },
 });

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, Image } from "react-native";
 import { Card, Text, Chip, Menu, IconButton } from "react-native-paper";
 import moment from "moment";
 import { useRouter } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const NoteCard = ({ note }) => {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -38,26 +39,35 @@ const NoteCard = ({ note }) => {
     console.log("Delete note with id:", note.id);
   };
 
+  const renderNoteIcon = () => {
+    switch (note.type) {
+      case "voice":
+        return (
+          <MaterialCommunityIcons name="microphone" size={40} color="#555" />
+        );
+      case "text":
+        return (
+          <Image
+            source={require("../assets/images/pencil.png")}
+            style={{ width: 40, height: 40 }}
+          />
+        );
+      default:
+        return (
+          <MaterialCommunityIcons name="note-text" size={40} color="#555" />
+        );
+    }
+  };
+
   return (
     <Card style={styles.noteCard}>
-      <Card.Title
-        titleStyle={styles.cardDate}
-        subtitleStyle={styles.cardTitle}
-        title={moment(note.date).calendar()}
-        subtitle={note.title}
-        right={(props) => (
-          <Menu
-            visible={menuVisible}
-            onDismiss={closeMenu}
-            anchor={
-              <IconButton {...props} icon="dots-vertical" onPress={openMenu} />
-            }
-          >
-            <Menu.Item onPress={handleEdit} title="Edit" />
-            <Menu.Item onPress={handleDelete} title="Delete" />
-          </Menu>
-        )}
-      />
+      <View style={styles.titleContainer}>
+        {renderNoteIcon()}
+        <View style={styles.titleTextContainer}>
+          <Text style={styles.cardTitle}>{note.title}</Text>
+          <Text style={styles.cardDate}>{moment(note.date).calendar()}</Text>
+        </View>
+      </View>
       <Card.Content>
         <Text style={styles.noteContent}>{note.content}</Text>
         <View style={styles.noteTags}>
@@ -78,21 +88,28 @@ const NoteCard = ({ note }) => {
 
 const styles = {
   noteCard: {
-    backgroundColor: "#f9f9f9", // Light gray background
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4, // Android shadow
+    backgroundColor: "rgba(241, 245, 245, 0.77)", // Light gray background
+    shadowColor: "transparent",
     marginBottom: 16,
-    marginHorizontal: 8,
     borderRadius: 12, // Nicer border radius
-    borderColor: "#eaeaea",
+    borderColor: "transparent",
     borderWidth: 1,
   },
   cardDate: {
     fontSize: 12,
     color: "#777",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 11,
+    paddingTop: 16,
+    paddingBottom: 8,
+    marginBottom: 8,
+  },
+  titleTextContainer: {
+    flex: 1,
+    marginLeft: 12,
   },
   cardTitle: {
     fontSize: 18,
@@ -105,16 +122,16 @@ const styles = {
     fontSize: 15,
     lineHeight: 22,
     color: "#444",
-    marginBottom: 10,
+    marginBottom: 15,
   },
   noteTags: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginTop: 10,
+    // marginTop: 10,
   },
   noteTag: {
     marginRight: 8,
-    marginBottom: 5,
+    marginBottom: 6,
     borderRadius: 20,
     backgroundColor: "#f0f0f0",
     borderColor: "#e0e0e0",

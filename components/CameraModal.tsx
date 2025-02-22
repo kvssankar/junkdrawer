@@ -9,6 +9,7 @@ import {
   TextInput,
   Dimensions,
   Platform,
+  Image,
 } from "react-native";
 import {
   Camera,
@@ -24,7 +25,8 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
   const { hasPermission, requestPermission } = useCameraPermission();
   const [cameraPosition, setCameraPosition] = useState("back");
   const [caption, setCaption] = useState("");
-  const [aspectRatio, setAspectRatio] = useState("portrait"); // default to portrait
+  const [aspectRatio, setAspectRatio] = useState("portrait");
+  const [capturedImage, setCapturedImage] = useState(null); // Store captured image
   const camera = useRef(null);
 
   // Get screen dimensions
@@ -51,13 +53,20 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
     }
   }, [isVisible, hasPermission, requestPermission]);
 
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isVisible) {
+      setCapturedImage(null);
+      setCaption("");
+    }
+  }, [isVisible]);
+
   // Function to convert image file to base64
   const getBase64FromUri = async (uri) => {
     try {
       const base64 = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
-      //first 20 chars
       console.log(base64.substring(0, 20));
       return base64;
     } catch (error) {
@@ -66,7 +75,7 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
     }
   };
 
-  const handleCapture = async () => {
+  const handleTakePhoto = async () => {
     if (camera.current) {
       try {
         // Get the frame processor's crop region coordinates
@@ -85,15 +94,26 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
         // Format base64 string with prefix for direct use in Image components
         const base64Uri = `data:image/jpeg;base64,${base64}`;
 
-        // Pass both the URI and base64 data
-        onCapture(base64Uri, caption);
-
-        setCaption("");
-        onClose();
+        // Store captured image in state
+        setCapturedImage(base64Uri);
       } catch (error) {
         console.error("Failed to take photo:", error);
       }
     }
+  };
+
+  const handleSave = () => {
+    // Pass both the URI and caption to parent component
+    onCapture(capturedImage, caption);
+    setCaption("");
+    setCapturedImage(null);
+    onClose();
+  };
+
+  const handleCancel = () => {
+    setCapturedImage(null);
+    setCaption("");
+    onClose();
   };
 
   // Function to calculate crop region based on selected aspect ratio
@@ -222,36 +242,66 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
 
   return (
     <Modal isVisible={isVisible} onBackdropPress={onClose} style={styles.modal}>
-      <View style={styles.modalContent}>
-        <Camera
-          ref={camera}
-          style={styles.camera}
-          device={device}
-          isActive={isVisible}
-          photo={true}
-        />
+      {capturedImage ? (
+        // Review screen (after photo is taken)
+        <View style={styles.modalContent}>
+          <Image source={{ uri: capturedImage }} style={styles.previewImage} />
 
-        {/* Capture box overlay */}
-        {renderCaptureOverlay()}
+          <View style={styles.captionContainer}>
+            <TextInput
+              style={styles.textArea}
+              placeholder="Add a caption (optional)"
+              placeholderTextColor="#999"
+              value={caption}
+              onChangeText={setCaption}
+              multiline
+            />
 
-        <TouchableOpacity
-          style={styles.flipButton}
-          onPress={toggleCameraPosition}
-        >
-          <MaterialCommunityIcons name="camera-flip" size={24} color="white" />
-        </TouchableOpacity>
-
-        <View style={styles.bottomContainer}>
-          <TextInput
-            style={styles.textArea}
-            placeholder="Add a caption (optional)"
-            placeholderTextColor="#999"
-            value={caption}
-            onChangeText={setCaption}
-            multiline
+            <View style={styles.buttonContainer}>
+              <Button
+                mode="contained"
+                buttonColor={"gray"}
+                onPress={handleCancel}
+                style={styles.closeButton}
+              >
+                Cancel
+              </Button>
+              <Button
+                mode="contained"
+                onPress={handleSave}
+                style={styles.captureButton}
+              >
+                Save
+              </Button>
+            </View>
+          </View>
+        </View>
+      ) : (
+        // Camera screen
+        <View style={styles.modalContent}>
+          <Camera
+            ref={camera}
+            style={styles.camera}
+            device={device}
+            isActive={isVisible && !capturedImage}
+            photo={true}
           />
 
-          <View style={styles.buttonContainer}>
+          {/* Capture box overlay */}
+          {renderCaptureOverlay()}
+
+          <TouchableOpacity
+            style={styles.flipButton}
+            onPress={toggleCameraPosition}
+          >
+            <MaterialCommunityIcons
+              name="camera-flip"
+              size={24}
+              color="white"
+            />
+          </TouchableOpacity>
+
+          <View style={styles.cameraButtonContainer}>
             <Button
               mode="contained"
               buttonColor={"gray"}
@@ -262,14 +312,14 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
             </Button>
             <Button
               mode="contained"
-              onPress={handleCapture}
+              onPress={handleTakePhoto}
               style={styles.captureButton}
             >
-              Capture
+              Take Photo
             </Button>
           </View>
         </View>
-      </View>
+      )}
     </Modal>
   );
 };
@@ -296,6 +346,10 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
+  },
+  previewImage: {
+    flex: 1,
+    resizeMode: "contain",
   },
   overlayContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -339,26 +393,35 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 12,
   },
-  bottomContainer: {
+  captionContainer: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(80,80,80,0.9)",
-    padding: 10,
+    backgroundColor: "white",
+    padding: 20,
     zIndex: 10,
   },
   textArea: {
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "white",
     borderRadius: 5,
-    color: "white",
+    // color: "white",
     padding: 10,
     minHeight: 60,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  cameraButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    padding: 20,
   },
   captureButton: {
     flex: 1,

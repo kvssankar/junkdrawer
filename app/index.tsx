@@ -234,6 +234,7 @@ const styles = StyleSheet.create({
   notesList: {
     flex: 1,
     padding: 16,
+    // paddingBottom: 80,
   },
   loadingText: {
     textAlign: "center",
@@ -247,12 +248,21 @@ const styles = StyleSheet.create({
     color: "#888",
   },
   bottomActions: {
+    position: "absolute",
+    bottom: 16,
+    alignSelf: "center", // Center it horizontally
     flexDirection: "row",
     justifyContent: "center",
-    padding: 16,
-    backgroundColor: "rgba(255, 255, 255, 1)",
-    borderRadius: 20,
+    // padding: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.9)", // Light translucent background
+    borderRadius: 50,
+    elevation: 8, // Shadow for Android
+    shadowColor: "#000", // Shadow for iOS
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
+
   fab: {
     borderRadius: 0,
     backgroundColor: "rgb(69, 129, 240)",

@@ -234,9 +234,9 @@ const NoteCard = ({ note }) => {
         {note.type === "image" && note.images && note.images.length && (
           <Image
             source={{
-              uri: note.images[0].startsWith("data:")
-                ? note.images[0]
-                : note.images[0],
+              uri: note.images[0].content.startsWith("data:")
+                ? note.images[0].content
+                : note.images[0].content,
             }}
             style={styles.noteImage}
             resizeMode="cover"

@@ -5,7 +5,7 @@ import { Searchbar, Chip, FAB } from "react-native-paper";
 import NoteCard from "@/components/NoteCard";
 import VoiceNoteModal from "@/components/VoiceNoteModal";
 import CameraModal from "@/components/CameraModal";
-import { fetchNotes } from "@/services/notes"; 
+import { createNote, fetchNotes } from "@/services/notes";
 
 const HomeScreen = () => {
   const tags = ["All Tags", "Finance", "Health", "Learning", "Sankar"];
@@ -30,7 +30,7 @@ const HomeScreen = () => {
         setLoading(false);
       }
     };
-    
+
     getNotes();
   }, []);
 
@@ -40,87 +40,82 @@ const HomeScreen = () => {
 
   const getRandId = () => Math.floor(Math.random() * 1000);
 
-  const handleAddTextNote = (noteText) => {
+  const handleAddTextNote = async (noteText) => {
     const id = getRandId();
-    setNotes([
-      {
-        id: id,
-        title: "Processing...",
-        content: noteText,
-        tags: [],
-        date: new Date(),
-        type: "text",
-        isProcessing: true,
-      },
-      ...notes,
-    ]);
-    setTimeout(() => {
+    const note = {
+      tempid: id,
+      title: "Processing...",
+      content: noteText,
+      tags: [],
+      createdAt: new Date(),
+      type: "text",
+      isProcessing: true,
+    };
+
+    setNotes([note, ...notes]);
+    setIsTextModalVisible(false);
+
+    try {
+      const newNote = await createNote(note);
       setNotes((prevState) => {
-        //if prev state has same id then update the title or else create a new note
-        const noteWithId = prevState.find((note) => note.id === id);
+        const noteWithId = prevState.find((note) => newNote.tempid === id);
         if (noteWithId) {
-          noteWithId.title = "New Text Note " + noteText;
+          noteWithId.title = newNote.title;
+          noteWithId.content = newNote.content;
+          noteWithId.tags = newNote.tags;
+          noteWithId.createdAt = newNote.createdAt;
+          noteWithId.summary = newNote.summary;
           noteWithId.isProcessing = false;
           return [...prevState];
         } else {
-          return [
-            ...prevState,
-            {
-              id: id,
-              title: "New Text Note " + noteText,
-              content: noteText,
-              tags: [],
-              date: new Date(),
-              type: "text",
-              isProcessing: false,
-            },
-          ];
+          return [...prevState, newNote];
         }
       });
-    }, 3000);
-    setIsTextModalVisible(false);
+    } catch (error) {
+      console.error("Error creating note:", error);
+    }
   };
 
-  const handleImageNote = (imageUri, caption) => {
+  const handleImageNote = async (imageUri, caption) => {
     const id = getRandId();
-    setNotes([
-      {
-        id: id,
-        title: "Processing...",
-        content: caption,
-        images: [imageUri],
-        tags: [],
-        date: new Date(),
-        type: "image",
-        isProcessing: true,
-      },
-      ...notes,
-    ]);
-    setTimeout(() => {
+    const note = {
+      tempid: id,
+      title: "Processing...",
+      content: caption,
+      images: [
+        {
+          type: "jpeg",
+          content: imageUri,
+        },
+      ],
+      tags: [],
+      createdAt: new Date(),
+      type: "image",
+      isProcessing: true,
+    };
+    setNotes([note, ...notes]);
+    setIsCameraModalVisible(false);
+
+    try {
+      const newNote = await createNote(note);
       setNotes((prevState) => {
-        const noteWithId = prevState.find((note) => note.id === id);
+        const noteWithId = prevState.find((note) => newNote.tempid === id);
         if (noteWithId) {
-          noteWithId.title = "New Image Note";
+          noteWithId.title = newNote.title;
+          noteWithId.content = newNote.content;
+          noteWithId.tags = newNote.tags;
+          noteWithId.createdAt = newNote.createdAt;
+          noteWithId.images = newNote.images;
           noteWithId.isProcessing = false;
+          noteWithId.summary = newNote.summary;
           return [...prevState];
         } else {
-          return [
-            ...prevState,
-            {
-              id: id,
-              title: "New Image Note",
-              content: caption,
-              imageUri: imageUri,
-              tags: [],
-              date: new Date(),
-              type: "image",
-              isProcessing: false,
-            },
-          ];
+          return [...prevState, newNote];
         }
       });
-    }, 3000);
-    setIsCameraModalVisible(false);
+    } catch (error) {
+      console.error("Error creating note:", error);
+    }
   };
 
   return (
@@ -151,16 +146,14 @@ const HomeScreen = () => {
         {loading ? (
           <Text style={styles.loadingText}>Loading notes...</Text>
         ) : notes.length > 0 ? (
-          notes.map((note, index) => (
-            <NoteCard key={index} note={note} />
-          ))
+          notes.map((note, index) => <NoteCard key={index} note={note} />)
         ) : (
           <Text style={styles.emptyText}>No notes found</Text>
         )}
       </ScrollView>
 
       <View style={styles.bottomActions}>
-        <FAB
+        {/* <FAB
           icon="microphone"
           style={[
             styles.fab,
@@ -169,10 +162,14 @@ const HomeScreen = () => {
           color="white"
           small
           onPress={() => setIsVoiceModalVisible(true)}
-        />
+        /> */}
         <FAB
           icon="text"
           style={styles.fab}
+          style={[
+            styles.fab,
+            { borderTopLeftRadius: 20, borderBottomLeftRadius: 20 },
+          ]}
           color="white"
           small
           onPress={() => setIsTextModalVisible(true)}
@@ -239,15 +236,15 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   loadingText: {
-    textAlign: 'center',
+    textAlign: "center",
     padding: 20,
     fontSize: 16,
   },
   emptyText: {
-    textAlign: 'center',
+    textAlign: "center",
     padding: 20,
     fontSize: 16,
-    color: '#888',
+    color: "#888",
   },
   bottomActions: {
     flexDirection: "row",

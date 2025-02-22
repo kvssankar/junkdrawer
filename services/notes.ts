@@ -17,8 +17,10 @@ export const fetchNotes = async () => {
 
 // Function to create a new note
 export const createNote = async (newNote) => {
+  await AsyncStorage.setItem("userToken", "Bearer 123"); //TODO: FIX TOKEN
+  const token = await AsyncStorage.getItem("userToken");
   const { data } = await axios.post(API_URL, newNote, {
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Authorization: token },
   });
   return data;
 };

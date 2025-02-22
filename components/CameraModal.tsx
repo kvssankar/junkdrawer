@@ -57,6 +57,8 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
       const base64 = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
+      //first 20 chars
+      console.log(base64.substring(0, 20));
       return base64;
     } catch (error) {
       console.error("Error converting image to base64:", error);

@@ -193,7 +193,15 @@ const NoteCard = ({ note }) => {
   };
 
   return (
-    <Card style={styles.noteCard}>
+    <Card
+      style={styles.noteCard}
+      onPress={() => {
+        navigation.push({
+          pathname: "/NoteDetailView",
+          params: { note: JSON.stringify(note) },
+        });
+      }}
+    >
       <View style={styles.titleContainer}>
         {renderNoteIcon()}
         <View style={styles.titleTextContainer}>

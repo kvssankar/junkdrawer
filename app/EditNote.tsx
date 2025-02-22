@@ -130,7 +130,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   inputOutline: {
-    borderColor: "transparent",
     borderWidth: 0,
   },
   tagRow: {

@@ -243,6 +243,7 @@ export default function RootLayout() {
     <PaperProvider theme={theme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="NoteDetailView" options={{ headerShown: false }} />
         <Stack.Screen name="EditNote" options={{ headerShown: false }} />
         <Stack.Screen name="EditVoiceNote" options={{ headerShown: false }} />
         <Stack.Screen name="EditImageNote" options={{ headerShown: false }} />

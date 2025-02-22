@@ -8,8 +8,8 @@ import CameraModal from "@/components/CameraModal";
 import { createNote, fetchNotes } from "@/services/notes";
 
 const HomeScreen = () => {
-  const tags = ["All Tags", "Finance", "Health", "Learning", "Sankar"];
-  const [selectedTag, setSelectedTag] = useState("All Tags");
+  const tags = ["All", "Finance", "Health", "Learning", "Sankar"];
+  const [selectedTag, setSelectedTag] = useState("All");
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -151,6 +151,8 @@ const HomeScreen = () => {
           <Text style={styles.emptyText}>No notes found</Text>
         )}
       </ScrollView>
+
+      {/* <View style={{ height: 80 }} /> */}
 
       <View style={styles.bottomActions}>
         {/* <FAB

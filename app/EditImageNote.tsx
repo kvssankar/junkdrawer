@@ -11,37 +11,59 @@ import {
 import Modal from "react-native-modal";
 import { useLocalSearchParams, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Appbar, TextInput, Button, Text } from "react-native-paper";
+import { Appbar, TextInput, Button, Text, Chip } from "react-native-paper";
+import { DatePickerInput } from "react-native-paper-dates";
 
 const EditImageNote = () => {
-  // Assume noteData is passed via route parameters
   const { note: noteParam } = useLocalSearchParams();
   const noteData = noteParam ? JSON.parse(noteParam) : {};
 
-  // For full-screen image modal
   const [isImageModalVisible, setImageModalVisible] = useState(false);
   const screenWidth = Dimensions.get("window").width;
 
-  // State for note title and content
+  // State for all editable fields
   const [title, setTitle] = useState(noteData.title || "");
   const [content, setContent] = useState(noteData.content || "");
+  const [tags, setTags] = useState(noteData.tags || []);
+  const [newTag, setNewTag] = useState("");
+  const [reminderDate, setReminderDate] = useState(
+    noteData.reminder_datetime
+      ? new Date(noteData.reminder_datetime)
+      : undefined
+  );
 
-  // Save handler (add your saving logic here)
   const handleSave = () => {
-    console.log("Saving note with", { title, content });
-    // Implement your saving logic then navigate back
+    const updatedNote = {
+      ...noteData,
+      title,
+      content,
+      tags,
+      reminder_datetime: reminderDate?.toISOString(),
+    };
+    console.log("Saving note:", updatedNote);
+    // Implement your API call here to save the note
     router.back();
+  };
+
+  const handleAddTag = () => {
+    if (newTag.trim() && !tags.includes(newTag.trim())) {
+      setTags([...tags, newTag.trim()]);
+      setNewTag("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title={noteData.title || "Edit Note"} />
+        <Appbar.Content title="Edit Note" />
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        {/* Display image if available and if the note type is image */}
         {noteData.type === "image" && noteData.imageUri && (
           <>
             <TouchableOpacity onPress={() => setImageModalVisible(true)}>
@@ -54,7 +76,6 @@ const EditImageNote = () => {
                 }}
               />
             </TouchableOpacity>
-            {/* Full-screen image modal */}
             <Modal
               isVisible={isImageModalVisible}
               onBackdropPress={() => setImageModalVisible(false)}
@@ -73,7 +94,6 @@ const EditImageNote = () => {
           </>
         )}
 
-        {/* Text inputs for Title and Content */}
         <TextInput
           label="Title"
           mode="outlined"
@@ -82,16 +102,62 @@ const EditImageNote = () => {
           style={styles.input}
           outlineStyle={styles.inputOutline}
         />
+
         <TextInput
           label="Content"
           mode="outlined"
           value={content}
           onChangeText={setContent}
           multiline
-          style={[styles.input, { height: 320 }]}
+          style={[styles.input, { height: 200 }]}
           outlineStyle={styles.inputOutline}
         />
-        {/* You can add additional fields (like tag inputs) here */}
+
+        {/* Reminder Date Section */}
+        <View style={styles.reminderSection}>
+          <Text variant="titleMedium" style={styles.sectionTitle}>
+            Reminder Date & Time
+          </Text>
+          <DatePickerInput
+            locale="en"
+            label="Reminder date"
+            value={reminderDate}
+            onChange={(date) => setReminderDate(date)}
+            inputMode="start"
+            mode="outlined"
+            style={styles.dateInput}
+          />
+        </View>
+
+        {/* Tags Section */}
+        <View style={styles.tagsSection}>
+          <Text variant="titleMedium" style={styles.sectionTitle}>
+            Tags
+          </Text>
+          <View style={styles.tagInput}>
+            <TextInput
+              mode="outlined"
+              value={newTag}
+              onChangeText={setNewTag}
+              placeholder="Add new tag"
+              style={{ flex: 1 }}
+              right={<TextInput.Icon icon="plus" onPress={handleAddTag} />}
+              onSubmitEditing={handleAddTag}
+            />
+          </View>
+          <View style={styles.tagsContainer}>
+            {tags.map((tag, index) => (
+              <Chip
+                key={index}
+                mode="outlined"
+                onClose={() => handleRemoveTag(tag)}
+                style={styles.chip}
+              >
+                {tag}
+              </Chip>
+            ))}
+          </View>
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -127,10 +193,36 @@ const styles = StyleSheet.create({
   inputOutline: {
     borderRadius: 4,
   },
+  sectionTitle: {
+    marginBottom: 8,
+  },
+  reminderSection: {
+    marginBottom: 16,
+  },
+  dateInput: {
+    marginTop: 8,
+  },
+  tagsSection: {
+    marginBottom: 16,
+  },
+  tagInput: {
+    flexDirection: "row",
+    marginVertical: 8,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 8,
+  },
+  chip: {
+    margin: 4,
+  },
   footer: {
     flexDirection: "row",
     justifyContent: "space-around",
     padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
   },
   footerButton: {
     flex: 1,

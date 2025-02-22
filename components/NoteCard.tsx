@@ -1,15 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { View, ScrollView, Image, Animated } from "react-native";
-import { Card, Text, Chip, Menu, IconButton } from "react-native-paper";
+import {
+  View,
+  ScrollView,
+  Image,
+  Animated,
+  TouchableOpacity,
+} from "react-native";
+import {
+  Card,
+  Text,
+  Chip,
+  Menu,
+  IconButton,
+  ProgressBar,
+} from "react-native-paper";
 import moment from "moment";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { Audio } from "expo-av";
 
 const NoteCard = ({ note }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const navigation = useRouter();
   const shimmerAnimation = new Animated.Value(-150);
+
+  // Audio player state
+  const [sound, setSound] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [position, setPosition] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [loaded, setLoaded] = useState(false);
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
@@ -28,6 +49,91 @@ const NoteCard = ({ note }) => {
       shimmerAnimation.setValue(-150);
     }
   }, [note.isProcessing]);
+
+  // Load sound for voice notes
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadSound() {
+      try {
+        if (note.type !== "voice" || !note.audioUri) return;
+
+        // Unload any existing sound
+        if (sound) {
+          await sound.unloadAsync();
+        }
+
+        // Load new sound
+        const { sound: newSound } = await Audio.Sound.createAsync(
+          { uri: note.audioUri },
+          { shouldPlay: false },
+          onPlaybackStatusUpdate
+        );
+
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setSound(newSound);
+          setLoaded(true);
+        }
+      } catch (error) {
+        console.error("Failed to load audio", error);
+      }
+    }
+
+    if (note.type === "voice") {
+      loadSound();
+    }
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [note.type, note.audioUri]);
+
+  // Track playback status
+  const onPlaybackStatusUpdate = (status) => {
+    if (!status.isLoaded) return;
+
+    // Update duration once when loaded
+    if (status.isLoaded && duration === 0) {
+      setDuration(status.durationMillis || 0);
+    }
+
+    // Update position during playback
+    setPosition(status.positionMillis || 0);
+
+    // Update playing state
+    setIsPlaying(status.isPlaying);
+
+    // Handle playback completion
+    if (status.didJustFinish) {
+      setIsPlaying(false);
+    }
+  };
+
+  const handlePlayPause = async () => {
+    if (!sound || !loaded) return;
+
+    try {
+      if (isPlaying) {
+        await sound.pauseAsync();
+      } else {
+        const status = await sound.getStatusAsync();
+
+        // If playback finished, start from beginning
+        if (status.positionMillis === status.durationMillis) {
+          await sound.setPositionAsync(0);
+        }
+
+        await sound.playAsync();
+      }
+    } catch (error) {
+      console.error("Error controlling playback", error);
+    }
+  };
 
   const handleEdit = () => {
     closeMenu();
@@ -60,7 +166,10 @@ const NoteCard = ({ note }) => {
     switch (note.type) {
       case "voice":
         return (
-          <MaterialCommunityIcons name="microphone" size={40} color="#555" />
+          <Image
+            source={require("../assets/images/music.png")}
+            style={{ width: 40, height: 40 }}
+          />
         );
       case "text":
         return (
@@ -93,6 +202,33 @@ const NoteCard = ({ note }) => {
         </View>
       </View>
       <Card.Content>
+        {note.type === "voice" && (
+          <View style={styles.audioPlayerContainer}>
+            <TouchableOpacity
+              onPress={handlePlayPause}
+              disabled={!loaded}
+              style={styles.playIconButton}
+            >
+              <MaterialCommunityIcons
+                name={isPlaying ? "pause-circle" : "play-circle"}
+                size={42}
+                color="#3498db"
+              />
+            </TouchableOpacity>
+
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressBarBackground}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    { width: `${(position / Math.max(duration, 1)) * 100}%` },
+                  ]}
+                />
+              </View>
+            </View>
+          </View>
+        )}
+
         {note.type === "image" && note.imageUri && (
           <Image
             source={{ uri: note.imageUri }}
@@ -214,6 +350,38 @@ const styles = {
   noteTagText: {
     fontSize: 12,
     color: "#666",
+  },
+  // Custom progress bar styles
+  audioPlayerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#eaeaea",
+  },
+  playIconButton: {
+    marginRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  progressBarContainer: {
+    flex: 1,
+    justifyContent: "center",
+    height: 24,
+  },
+  progressBarBackground: {
+    height: 8,
+    backgroundColor: "#e1e1e1",
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  progressBarFill: {
+    height: "100%",
+    backgroundColor: "#3498db",
+    borderRadius: 4,
   },
 };
 

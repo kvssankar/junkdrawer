@@ -116,6 +116,7 @@ const VoiceNoteModal = ({ isVisible, onClose, onSave }) => {
             tags: ["Voice"],
             date: new Date(),
             type: "voice", // Identify this as a voice note
+            isProcessing: false,
           };
 
           setRecording(null);

@@ -1,4 +1,4 @@
-// CameraModal.tsx with improved overlay for landscape mode
+// CameraModal.tsx with base64 support
 import React, { useRef, useState, useEffect } from "react";
 import {
   View,
@@ -8,6 +8,7 @@ import {
   Linking,
   TextInput,
   Dimensions,
+  Platform,
 } from "react-native";
 import {
   Camera,
@@ -17,6 +18,7 @@ import {
 import Modal from "react-native-modal";
 import { Button } from "react-native-paper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import * as FileSystem from "expo-file-system";
 
 const CameraModal = ({ isVisible, onClose, onCapture }) => {
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -49,6 +51,19 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
     }
   }, [isVisible, hasPermission, requestPermission]);
 
+  // Function to convert image file to base64
+  const getBase64FromUri = async (uri) => {
+    try {
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      return base64;
+    } catch (error) {
+      console.error("Error converting image to base64:", error);
+      return null;
+    }
+  };
+
   const handleCapture = async () => {
     if (camera.current) {
       try {
@@ -60,8 +75,16 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
           enableShutterSound: false,
         });
 
-        // Pass the crop region with the photo for later processing
-        onCapture(`file://${photo.path}`, caption);
+        const photoUri = `file://${photo.path}`;
+
+        // Convert the photo to base64
+        const base64 = await getBase64FromUri(photoUri);
+
+        // Format base64 string with prefix for direct use in Image components
+        const base64Uri = `data:image/jpeg;base64,${base64}`;
+
+        // Pass both the URI and base64 data
+        onCapture(base64Uri, caption);
 
         setCaption("");
         onClose();
@@ -215,36 +238,6 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
         >
           <MaterialCommunityIcons name="camera-flip" size={24} color="white" />
         </TouchableOpacity>
-
-        {/* Aspect ratio selection buttons */}
-        {/* <View style={styles.aspectRatioContainer}>
-          <TouchableOpacity
-            style={[
-              styles.aspectRatioButton,
-              aspectRatio === "landscape" && styles.selectedAspectRatio,
-            ]}
-            onPress={() => setAspectRatio("landscape")}
-          >
-            <MaterialCommunityIcons
-              name="rectangle-outline"
-              size={29}
-              color="white"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.aspectRatioButton,
-              aspectRatio === "portrait" && styles.selectedAspectRatio,
-            ]}
-            onPress={() => setAspectRatio("portrait")}
-          >
-            <MaterialCommunityIcons
-              name="mirror-rectangle"
-              size={29}
-              color="white"
-            />
-          </TouchableOpacity>
-        </View> */}
 
         <View style={styles.bottomContainer}>
           <TextInput

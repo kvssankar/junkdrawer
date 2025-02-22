@@ -231,13 +231,18 @@ const NoteCard = ({ note }) => {
           </View>
         )}
 
-        {note.type === "image" && note.imageUri && (
+        {note.type === "image" && note.images && note.images.length && (
           <Image
-            source={{ uri: note.imageUri }}
+            source={{
+              uri: note.images[0].startsWith("data:")
+                ? note.images[0]
+                : note.images[0],
+            }}
             style={styles.noteImage}
             resizeMode="cover"
           />
         )}
+
         <Text style={styles.noteContent}>{note.content}</Text>
         <View style={styles.noteTags}>
           {note.tags &&

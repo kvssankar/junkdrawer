@@ -88,7 +88,7 @@ const HomeScreen = () => {
         id: id,
         title: "Processing...",
         content: caption,
-        imageUri: imageUri,
+        images: [imageUri],
         tags: [],
         date: new Date(),
         type: "image",

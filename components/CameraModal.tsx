@@ -22,7 +22,7 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
   const { hasPermission, requestPermission } = useCameraPermission();
   const [cameraPosition, setCameraPosition] = useState("back");
   const [caption, setCaption] = useState("");
-  const [aspectRatio, setAspectRatio] = useState("landscape"); // default to portrait
+  const [aspectRatio, setAspectRatio] = useState("portrait"); // default to portrait
   const camera = useRef(null);
 
   // Get screen dimensions
@@ -61,11 +61,7 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
         });
 
         // Pass the crop region with the photo for later processing
-        onCapture({
-          uri: `file://${photo.path}`,
-          caption,
-          cropRegion,
-        });
+        onCapture(`file://${photo.path}`, caption);
 
         setCaption("");
         onClose();
@@ -221,7 +217,7 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
         </TouchableOpacity>
 
         {/* Aspect ratio selection buttons */}
-        <View style={styles.aspectRatioContainer}>
+        {/* <View style={styles.aspectRatioContainer}>
           <TouchableOpacity
             style={[
               styles.aspectRatioButton,
@@ -229,7 +225,6 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
             ]}
             onPress={() => setAspectRatio("landscape")}
           >
-            {/* Square icon for landscape */}
             <MaterialCommunityIcons
               name="rectangle-outline"
               size={29}
@@ -243,14 +238,13 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
             ]}
             onPress={() => setAspectRatio("portrait")}
           >
-            {/* Vertical rectangle icon for portrait */}
             <MaterialCommunityIcons
               name="mirror-rectangle"
               size={29}
               color="white"
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         <View style={styles.bottomContainer}>
           <TextInput

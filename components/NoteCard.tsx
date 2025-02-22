@@ -93,17 +93,25 @@ const NoteCard = ({ note }) => {
         </View>
       </View>
       <Card.Content>
+        {note.type === "image" && note.imageUri && (
+          <Image
+            source={{ uri: note.imageUri }}
+            style={styles.noteImage}
+            resizeMode="cover"
+          />
+        )}
         <Text style={styles.noteContent}>{note.content}</Text>
         <View style={styles.noteTags}>
-          {note.tags.map((tag, idx) => (
-            <Chip
-              key={idx}
-              style={styles.noteTag}
-              textStyle={styles.noteTagText}
-            >
-              {tag}
-            </Chip>
-          ))}
+          {note.tags &&
+            note.tags.map((tag, idx) => (
+              <Chip
+                key={idx}
+                style={styles.noteTag}
+                textStyle={styles.noteTagText}
+              >
+                {tag}
+              </Chip>
+            ))}
         </View>
       </Card.Content>
 
@@ -176,6 +184,12 @@ const styles = {
     fontFamily: "Poppins_700Bold",
     marginTop: 2,
     color: "#333",
+  },
+  noteImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 12,
   },
   noteContent: {
     fontSize: 15,

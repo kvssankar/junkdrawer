@@ -17,6 +17,7 @@ const HomeScreen = () => {
       tags: ["Family", "To do List"],
       date: new Date(),
       type: "text",
+      isProcessing: false,
     },
   ];
   const [notes, setNotes] = useState(n);
@@ -41,6 +42,7 @@ const HomeScreen = () => {
         tags: [],
         date: new Date(),
         type: "text",
+        isProcessing: true,
       },
       ...notes,
     ]);
@@ -50,6 +52,7 @@ const HomeScreen = () => {
         const noteWithId = prevState.find((note) => note.id === id);
         if (noteWithId) {
           noteWithId.title = "New Text Note " + noteText;
+          noteWithId.isProcessing = false;
           return [...prevState];
         } else {
           return [
@@ -61,11 +64,12 @@ const HomeScreen = () => {
               tags: [],
               date: new Date(),
               type: "text",
+              isProcessing: false,
             },
           ];
         }
       });
-    }, 3000);
+    }, 1000);
     setIsTextModalVisible(false);
   };
 

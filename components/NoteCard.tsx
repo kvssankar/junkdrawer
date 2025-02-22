@@ -1,16 +1,33 @@
-import React, { useState } from "react";
-import { View, ScrollView, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, ScrollView, Image, Animated } from "react-native";
 import { Card, Text, Chip, Menu, IconButton } from "react-native-paper";
 import moment from "moment";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 const NoteCard = ({ note }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const navigation = useRouter();
+  const shimmerAnimation = new Animated.Value(-150);
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
+
+  useEffect(() => {
+    if (note.isProcessing) {
+      Animated.loop(
+        Animated.timing(shimmerAnimation, {
+          toValue: 400,
+          duration: 1500,
+          useNativeDriver: true,
+        })
+      ).start();
+    } else {
+      //stop animation
+      shimmerAnimation.setValue(-150);
+    }
+  }, [note.isProcessing]);
 
   const handleEdit = () => {
     closeMenu();
@@ -89,6 +106,28 @@ const NoteCard = ({ note }) => {
           ))}
         </View>
       </Card.Content>
+
+      {note.isProcessing && (
+        <Animated.View
+          style={[
+            styles.shimmerContainer,
+            {
+              transform: [{ translateX: shimmerAnimation }],
+            },
+          ]}
+        >
+          <LinearGradient
+            colors={[
+              "rgba(255,255,255,0)",
+              "rgba(255,255,255,0.6)",
+              "rgba(255,255,255,0)",
+            ]}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.shimmer}
+          />
+        </Animated.View>
+      )}
     </Card>
   );
 };
@@ -101,6 +140,19 @@ const styles = {
     borderRadius: 12, // Nicer border radius
     borderColor: "transparent",
     borderWidth: 1,
+    overflow: "hidden", // Important to contain the shimmer effect
+  },
+  shimmerContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 150,
+    height: "100%",
+    zIndex: 1,
+  },
+  shimmer: {
+    width: "100%",
+    height: "100%",
   },
   cardDate: {
     fontSize: 12,
@@ -134,6 +186,7 @@ const styles = {
   noteTags: {
     flexDirection: "row",
     flexWrap: "wrap",
+    marginBottom: 10,
     // marginTop: 10,
   },
   noteTag: {

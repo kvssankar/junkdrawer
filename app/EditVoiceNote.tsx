@@ -26,7 +26,7 @@ interface VoiceNote {
   content: string; // Text description
   audioUri: string; // Path to the audio file
   tags: string[];
-  date: Date;
+  createdAt: Date;
   type: NoteType;
 }
 
@@ -39,7 +39,7 @@ export default function EditVoiceNote() {
         content: "",
         audioUri: "",
         tags: [],
-        date: new Date(),
+        createdAt: new Date(),
         type: "voice",
       };
 
@@ -168,7 +168,7 @@ export default function EditVoiceNote() {
       title,
       content,
       tags,
-      date: new Date(),
+      createdAt: new Date(),
     };
     console.log("Updated Voice Note:", updatedNote);
     router.back();

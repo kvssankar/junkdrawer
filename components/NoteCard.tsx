@@ -198,7 +198,9 @@ const NoteCard = ({ note }) => {
         {renderNoteIcon()}
         <View style={styles.titleTextContainer}>
           <Text style={styles.cardTitle}>{note.title}</Text>
-          <Text style={styles.cardDate}>{moment(note.date).calendar()}</Text>
+          <Text style={styles.cardDate}>
+            {moment(note.createdAt).calendar()}
+          </Text>
         </View>
       </View>
       <Card.Content>

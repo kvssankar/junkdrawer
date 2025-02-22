@@ -114,7 +114,7 @@ const VoiceNoteModal = ({ isVisible, onClose, onSave }) => {
             content: "", // Empty description initially
             audioUri: permanentUri,
             tags: ["Voice"],
-            date: new Date(),
+            createdAt: new Date(),
             type: "voice", // Identify this as a voice note
             isProcessing: false,
           };

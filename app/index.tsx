@@ -1,30 +1,38 @@
 import AddNoteModal from "@/components/AddNoteModal";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView, Text } from "react-native";
 import { Searchbar, Chip, FAB } from "react-native-paper";
 import NoteCard from "@/components/NoteCard";
 import VoiceNoteModal from "@/components/VoiceNoteModal";
 import CameraModal from "@/components/CameraModal";
+import { fetchNotes } from "@/services/notes"; 
 
 const HomeScreen = () => {
   const tags = ["All Tags", "Finance", "Health", "Learning", "Sankar"];
   const [selectedTag, setSelectedTag] = useState("All Tags");
-
-  const n = [
-    {
-      title: "Honey-Do List",
-      content: "Shopping list and tasks...",
-      tags: ["Family", "To do List"],
-      date: new Date(),
-      type: "text",
-      isProcessing: false,
-    },
-  ];
-  const [notes, setNotes] = useState(n);
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [isTextModalVisible, setIsTextModalVisible] = useState(false);
   const [isVoiceModalVisible, setIsVoiceModalVisible] = useState(false);
   const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
+
+  // Fetch notes when component mounts
+  useEffect(() => {
+    const getNotes = async () => {
+      try {
+        setLoading(true);
+        const fetchedNotes = await fetchNotes();
+        setNotes(fetchedNotes);
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    getNotes();
+  }, []);
 
   const handleTagPress = (tag) => {
     setSelectedTag(tag);
@@ -140,9 +148,15 @@ const HomeScreen = () => {
       </ScrollView>
 
       <ScrollView style={styles.notesList}>
-        {notes.map((note, index) => (
-          <NoteCard key={index} note={note} />
-        ))}
+        {loading ? (
+          <Text style={styles.loadingText}>Loading notes...</Text>
+        ) : notes.length > 0 ? (
+          notes.map((note, index) => (
+            <NoteCard key={index} note={note} />
+          ))
+        ) : (
+          <Text style={styles.emptyText}>No notes found</Text>
+        )}
       </ScrollView>
 
       <View style={styles.bottomActions}>
@@ -224,6 +238,17 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  loadingText: {
+    textAlign: 'center',
+    padding: 20,
+    fontSize: 16,
+  },
+  emptyText: {
+    textAlign: 'center',
+    padding: 20,
+    fontSize: 16,
+    color: '#888',
+  },
   bottomActions: {
     flexDirection: "row",
     justifyContent: "center",
@@ -232,7 +257,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   fab: {
-    // margin: 8,
     borderRadius: 0,
     backgroundColor: "rgb(69, 129, 240)",
     color: "white",

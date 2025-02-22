@@ -8,7 +8,34 @@ import CameraModal from "@/components/CameraModal";
 import { createNote, fetchNotes } from "@/services/notes";
 
 const HomeScreen = () => {
-  const tags = ["All", "Finance", "Health", "Learning", "Sankar"];
+  // In HomeScreen.tsx
+  const tagMapping = {
+    Events: "Events/Posters",
+    Private: "Phone/Email/Secrets", // or 'Private' if you prefer
+  };
+
+  const tags = [
+    "All",
+    "Reminders",
+    "Events",
+    "Work",
+    "Urls",
+    "Private", // or 'Private'
+    "Lists",
+    "Others",
+  ];
+
+  const getFilteredNotes = () => {
+    if (selectedTag === "All") {
+      return notes;
+    }
+    const categoryToFilter = tagMapping[selectedTag] || selectedTag;
+    return notes.filter(
+      (note) =>
+        note.folder_category && note.folder_category.includes(categoryToFilter)
+    );
+  };
+
   const [selectedTag, setSelectedTag] = useState("All");
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -145,8 +172,10 @@ const HomeScreen = () => {
       <ScrollView style={styles.notesList}>
         {loading ? (
           <Text style={styles.loadingText}>Loading notes...</Text>
-        ) : notes.length > 0 ? (
-          notes.map((note, index) => <NoteCard key={index} note={note} />)
+        ) : getFilteredNotes().length > 0 ? (
+          getFilteredNotes().map((note, index) => (
+            <NoteCard key={index} note={note} />
+          ))
         ) : (
           <Text style={styles.emptyText}>No notes found</Text>
         )}

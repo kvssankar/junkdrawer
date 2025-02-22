@@ -1,4 +1,4 @@
-// CameraModal.tsx
+// CameraModal.tsx with improved overlay for landscape mode
 import React, { useRef, useState, useEffect } from "react";
 import {
   View,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Linking,
   TextInput,
+  Dimensions,
 } from "react-native";
 import {
   Camera,
@@ -15,12 +16,18 @@ import {
 } from "react-native-vision-camera";
 import Modal from "react-native-modal";
 import { Button } from "react-native-paper";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const CameraModal = ({ isVisible, onClose, onCapture }) => {
   const { hasPermission, requestPermission } = useCameraPermission();
   const [cameraPosition, setCameraPosition] = useState("back");
   const [caption, setCaption] = useState("");
+  const [aspectRatio, setAspectRatio] = useState("landscape"); // default to portrait
   const camera = useRef(null);
+
+  // Get screen dimensions
+  const screenWidth = Dimensions.get("window").width;
+  const screenHeight = Dimensions.get("window").height;
 
   const handleRequestPermission = async () => {
     try {
@@ -45,8 +52,21 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
   const handleCapture = async () => {
     if (camera.current) {
       try {
-        const photo = await camera.current.takePhoto();
-        onCapture(`file://${photo.path}`, caption);
+        // Get the frame processor's crop region coordinates
+        const cropRegion = getCropRegion();
+
+        const photo = await camera.current.takePhoto({
+          flash: "off",
+          enableShutterSound: false,
+        });
+
+        // Pass the crop region with the photo for later processing
+        onCapture({
+          uri: `file://${photo.path}`,
+          caption,
+          cropRegion,
+        });
+
         setCaption("");
         onClose();
       } catch (error) {
@@ -55,8 +75,85 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
     }
   };
 
+  // Function to calculate crop region based on selected aspect ratio
+  const getCropRegion = () => {
+    if (aspectRatio === "landscape") {
+      // Credit card/landscape ratio (roughly 1.6:1)
+      const boxWidth = screenWidth; // Full width
+      const boxHeight = boxWidth / 1.6; // Maintain credit card aspect ratio
+
+      // Center vertically
+      const centerY = screenHeight / 2;
+
+      return {
+        x: 0,
+        y: centerY - boxHeight / 2,
+        width: boxWidth,
+        height: boxHeight,
+      };
+    } else {
+      // portrait
+      // Full screen/camera view
+      return {
+        x: 0,
+        y: 0,
+        width: screenWidth,
+        height: screenHeight,
+      };
+    }
+  };
+
   const toggleCameraPosition = () => {
     setCameraPosition((prev) => (prev === "back" ? "front" : "back"));
+  };
+
+  // For rendering the overlay guide
+  const renderCaptureOverlay = () => {
+    // Only show overlay for landscape mode
+    if (aspectRatio !== "landscape") return null;
+
+    const cropRegion = getCropRegion();
+
+    return (
+      <View style={styles.overlayContainer}>
+        {/* Top dimmed area */}
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: cropRegion.y,
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        />
+
+        {/* Bottom dimmed area */}
+        <View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: screenHeight - (cropRegion.y + cropRegion.height),
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        />
+
+        {/* Border around the capture area */}
+        <View
+          style={[
+            styles.captureBox,
+            {
+              left: cropRegion.x,
+              top: cropRegion.y,
+              width: cropRegion.width,
+              height: cropRegion.height,
+            },
+          ]}
+        />
+      </View>
+    );
   };
 
   if (!hasPermission) {
@@ -65,8 +162,8 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
         isVisible={isVisible}
         onBackdropPress={onClose}
         style={styles.modal}
-        animationIn="fadeIn" // or "slideInUp"
-        animationOut="fadeOut" // or "slideOutDown"
+        animationIn="fadeIn"
+        animationOut="fadeOut"
         animationInTiming={300}
         animationOutTiming={300}
         backdropTransitionInTiming={300}
@@ -112,12 +209,48 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
           isActive={isVisible}
           photo={true}
         />
+
+        {/* Capture box overlay */}
+        {renderCaptureOverlay()}
+
         <TouchableOpacity
           style={styles.flipButton}
           onPress={toggleCameraPosition}
         >
-          <Text style={styles.flipText}>Flip</Text>
+          <MaterialCommunityIcons name="camera-flip" size={24} color="white" />
         </TouchableOpacity>
+
+        {/* Aspect ratio selection buttons */}
+        <View style={styles.aspectRatioContainer}>
+          <TouchableOpacity
+            style={[
+              styles.aspectRatioButton,
+              aspectRatio === "landscape" && styles.selectedAspectRatio,
+            ]}
+            onPress={() => setAspectRatio("landscape")}
+          >
+            {/* Square icon for landscape */}
+            <MaterialCommunityIcons
+              name="rectangle-outline"
+              size={29}
+              color="white"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.aspectRatioButton,
+              aspectRatio === "portrait" && styles.selectedAspectRatio,
+            ]}
+            onPress={() => setAspectRatio("portrait")}
+          >
+            {/* Vertical rectangle icon for portrait */}
+            <MaterialCommunityIcons
+              name="mirror-rectangle"
+              size={29}
+              color="white"
+            />
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.bottomContainer}>
           <TextInput
@@ -154,7 +287,7 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
 
 const styles = StyleSheet.create({
   modal: {
-    margin: 0, // Removes default margin so modal takes full screen
+    margin: 0,
   },
   modalContent: {
     flex: 1,
@@ -175,6 +308,15 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
+  overlayContainer: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  captureBox: {
+    position: "absolute",
+    borderWidth: 2,
+    borderColor: "#fff",
+    backgroundColor: "transparent",
+  },
   flipButton: {
     position: "absolute",
     top: 40,
@@ -182,10 +324,31 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     padding: 10,
     borderRadius: 5,
+    zIndex: 10,
   },
   flipText: {
     color: "white",
     fontWeight: "bold",
+  },
+  aspectRatioContainer: {
+    position: "absolute",
+    top: 90,
+    right: 20,
+    flexDirection: "column",
+    zIndex: 10,
+  },
+  aspectRatioButton: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 8,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  selectedAspectRatio: {
+    backgroundColor: "rgba(0,120,255,0.7)",
+  },
+  aspectRatioText: {
+    color: "white",
+    fontSize: 12,
   },
   bottomContainer: {
     position: "absolute",
@@ -194,6 +357,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "rgba(80,80,80,0.9)",
     padding: 10,
+    zIndex: 10,
   },
   textArea: {
     backgroundColor: "rgba(255,255,255,0.2)",

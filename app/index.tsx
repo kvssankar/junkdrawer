@@ -69,8 +69,50 @@ const HomeScreen = () => {
           ];
         }
       });
-    }, 1000);
+    }, 3000);
     setIsTextModalVisible(false);
+  };
+
+  const handleImageNote = (imageUri, caption) => {
+    const id = getRandId();
+    setNotes([
+      {
+        id: id,
+        title: "Processing...",
+        content: caption,
+        imageUri: imageUri,
+        tags: [],
+        date: new Date(),
+        type: "image",
+        isProcessing: true,
+      },
+      ...notes,
+    ]);
+    setTimeout(() => {
+      setNotes((prevState) => {
+        const noteWithId = prevState.find((note) => note.id === id);
+        if (noteWithId) {
+          noteWithId.title = "New Image Note";
+          noteWithId.isProcessing = false;
+          return [...prevState];
+        } else {
+          return [
+            ...prevState,
+            {
+              id: id,
+              title: "New Image Note",
+              content: caption,
+              imageUri: imageUri,
+              tags: [],
+              date: new Date(),
+              type: "image",
+              isProcessing: false,
+            },
+          ];
+        }
+      });
+    }, 3000);
+    setIsCameraModalVisible(false);
   };
 
   return (
@@ -146,19 +188,7 @@ const HomeScreen = () => {
       <CameraModal
         isVisible={isCameraModalVisible}
         onClose={() => setIsCameraModalVisible(false)}
-        onCapture={(imageUri) =>
-          setNotes([
-            {
-              title: "New Image Note",
-              content: "",
-              imageUri,
-              tags: ["Image"],
-              date: new Date(),
-              type: "image",
-            },
-            ...notes,
-          ])
-        }
+        onCapture={handleImageNote}
       />
     </View>
   );

@@ -52,6 +52,13 @@ const NoteCard = ({ note }) => {
             style={{ width: 40, height: 40 }}
           />
         );
+      case "image":
+        return (
+          <Image
+            source={require("../assets/images/image.png")}
+            style={{ width: 40, height: 40 }}
+          />
+        );
       default:
         return (
           <MaterialCommunityIcons name="note-text" size={40} color="#555" />

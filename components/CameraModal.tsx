@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   Linking,
+  TextInput,
 } from "react-native";
 import {
   Camera,
@@ -18,6 +19,7 @@ import { Button } from "react-native-paper";
 const CameraModal = ({ isVisible, onClose, onCapture }) => {
   const { hasPermission, requestPermission } = useCameraPermission();
   const [cameraPosition, setCameraPosition] = useState("back");
+  const [caption, setCaption] = useState("");
   const camera = useRef(null);
 
   const handleRequestPermission = async () => {
@@ -44,7 +46,8 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
     if (camera.current) {
       try {
         const photo = await camera.current.takePhoto();
-        onCapture(`file://${photo.path}`);
+        onCapture(`file://${photo.path}`, caption);
+        setCaption("");
         onClose();
       } catch (error) {
         console.error("Failed to take photo:", error);
@@ -71,11 +74,11 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
       >
         <View style={styles.permissionContainer}>
           <Text style={styles.message}>Camera permission is required</Text>
-          <Button mode="contained" onPress={handleRequestPermission}>
-            Grant Permission
-          </Button>
           <Button mode="outlined" onPress={onClose} style={styles.closeButton}>
             Cancel
+          </Button>
+          <Button mode="contained" onPress={handleRequestPermission}>
+            Grant Permission
           </Button>
         </View>
       </Modal>
@@ -115,17 +118,34 @@ const CameraModal = ({ isVisible, onClose, onCapture }) => {
         >
           <Text style={styles.flipText}>Flip</Text>
         </TouchableOpacity>
-        <View style={styles.buttonContainer}>
-          <Button
-            mode="contained"
-            onPress={handleCapture}
-            style={styles.captureButton}
-          >
-            Capture
-          </Button>
-          <Button mode="outlined" onPress={onClose} style={styles.closeButton}>
-            Cancel
-          </Button>
+
+        <View style={styles.bottomContainer}>
+          <TextInput
+            style={styles.textArea}
+            placeholder="Add a caption (optional)"
+            placeholderTextColor="#999"
+            value={caption}
+            onChangeText={setCaption}
+            multiline
+          />
+
+          <View style={styles.buttonContainer}>
+            <Button
+              mode="contained"
+              buttonColor={"gray"}
+              onPress={onClose}
+              style={styles.closeButton}
+            >
+              Cancel
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleCapture}
+              style={styles.captureButton}
+            >
+              Capture
+            </Button>
+          </View>
         </View>
       </View>
     </Modal>
@@ -167,21 +187,33 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  buttonContainer: {
+  bottomContainer: {
     position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(80,80,80,0.9)",
+    padding: 10,
+  },
+  textArea: {
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 5,
+    color: "white",
+    padding: 10,
+    minHeight: 60,
+    marginBottom: 10,
+  },
+  buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
   },
   captureButton: {
     flex: 1,
-    marginRight: 10,
+    marginLeft: 10,
   },
   closeButton: {
     flex: 1,
-    marginLeft: 10,
+    marginRight: 10,
   },
 });
 

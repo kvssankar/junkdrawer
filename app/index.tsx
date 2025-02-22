@@ -29,6 +29,46 @@ const HomeScreen = () => {
     setSelectedTag(tag);
   };
 
+  const getRandId = () => Math.floor(Math.random() * 1000);
+
+  const handleAddTextNote = (noteText) => {
+    const id = getRandId();
+    setNotes([
+      {
+        id: id,
+        title: "Processing...",
+        content: noteText,
+        tags: [],
+        date: new Date(),
+        type: "text",
+      },
+      ...notes,
+    ]);
+    setTimeout(() => {
+      setNotes((prevState) => {
+        //if prev state has same id then update the title or else create a new note
+        const noteWithId = prevState.find((note) => note.id === id);
+        if (noteWithId) {
+          noteWithId.title = "New Text Note " + noteText;
+          return [...prevState];
+        } else {
+          return [
+            ...prevState,
+            {
+              id: id,
+              title: "New Text Note " + noteText,
+              content: noteText,
+              tags: [],
+              date: new Date(),
+              type: "text",
+            },
+          ];
+        }
+      });
+    }, 3000);
+    setIsTextModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -92,19 +132,7 @@ const HomeScreen = () => {
       <AddNoteModal
         isVisible={isTextModalVisible}
         onClose={() => setIsTextModalVisible(false)}
-        onAdd={(noteText) => {
-          setNotes([
-            {
-              title: "New Note",
-              content: noteText,
-              tags: ["New"],
-              date: new Date(),
-              type: "text",
-            },
-            ...notes,
-          ]);
-          setIsTextModalVisible(false);
-        }}
+        onAdd={handleAddTextNote}
       />
       <VoiceNoteModal
         isVisible={isVoiceModalVisible}

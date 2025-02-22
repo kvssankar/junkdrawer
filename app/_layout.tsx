@@ -68,6 +68,58 @@ export default function RootLayout() {
 
   const theme = {
     ...DefaultTheme,
+    colors: {
+      primary: "rgb(39, 111, 245)", // Primary Blue (#276FF5)
+      onPrimary: "rgb(255, 255, 255)", // White text on primary
+      primaryContainer: "rgb(200, 222, 255)", // Light blue container
+      onPrimaryContainer: "rgb(0, 30, 80)", // Darker text on light blue
+
+      secondary: "rgb(220, 220, 220)", // Soft grayish-white
+      onSecondary: "rgb(50, 50, 50)", // Darker text on secondary
+      secondaryContainer: "rgb(240, 240, 240)", // Slightly darker gray
+      onSecondaryContainer: "rgb(33, 33, 33)", // Dark text for contrast
+
+      tertiary: "rgb(150, 150, 150)", // Neutral gray tertiary color
+      onTertiary: "rgb(255, 255, 255)", // White text on tertiary
+      tertiaryContainer: "rgb(230, 230, 230)", // Light gray container
+      onTertiaryContainer: "rgb(40, 40, 40)", // Dark text on light tertiary
+
+      error: "rgb(211, 47, 47)", // Strong red for errors
+      onError: "rgb(255, 255, 255)", // White text on error
+      errorContainer: "rgb(255, 205, 210)", // Light red error background
+      onErrorContainer: "rgb(105, 0, 0)", // Darker text for error contrast
+
+      background: "rgb(245, 245, 245)", // Light grayish background
+      onBackground: "rgb(30, 30, 30)", // Dark text on background
+
+      surface: "rgb(255, 255, 255)", // Pure white surface
+      onSurface: "rgb(30, 30, 30)", // Dark text on surface
+      surfaceVariant: "rgb(225, 225, 225)", // Slightly darker surface
+      onSurfaceVariant: "rgb(60, 60, 60)", // Medium-dark text on variant
+
+      outline: "rgb(150, 150, 150)", // Medium gray outlines
+      outlineVariant: "rgb(200, 200, 200)", // Lighter outline
+
+      shadow: "rgb(0, 0, 0)", // Default black shadows
+      scrim: "rgb(0, 0, 0)", // Default black overlay
+
+      inverseSurface: "rgb(50, 50, 50)", // Dark surface for inverted themes
+      inverseOnSurface: "rgb(220, 220, 220)", // Light text on dark surface
+      inversePrimary: "rgb(150, 200, 255)", // Lighter blue for inverse
+
+      elevation: {
+        level0: "transparent",
+        level1: "rgb(240, 240, 240)",
+        level2: "rgb(230, 230, 230)",
+        level3: "rgb(220, 220, 220)",
+        level4: "rgb(210, 210, 210)",
+        level5: "rgb(200, 200, 200)",
+      },
+
+      surfaceDisabled: "rgba(30, 30, 30, 0.12)", // Muted surface
+      onSurfaceDisabled: "rgba(30, 30, 30, 0.38)", // Muted text
+      backdrop: "rgba(50, 50, 50, 0.4)", // Semi-transparent dark backdrop
+    },
     fonts: {
       default: {
         fontFamily: "Poppins_400Regular",

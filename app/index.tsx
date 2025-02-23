@@ -1,7 +1,7 @@
 import AddNoteModal from "@/components/AddNoteModal";
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ScrollView, Text } from "react-native";
-import { Searchbar, Chip, FAB } from "react-native-paper";
+import { View, StyleSheet, ScrollView, RefreshControl } from "react-native";
+import { Searchbar, Chip, FAB, Text } from "react-native-paper";
 import NoteCard from "@/components/NoteCard";
 import VoiceNoteModal from "@/components/VoiceNoteModal";
 import CameraModal from "@/components/CameraModal";
@@ -43,6 +43,20 @@ const HomeScreen = () => {
   const [isTextModalVisible, setIsTextModalVisible] = useState(false);
   const [isVoiceModalVisible, setIsVoiceModalVisible] = useState(false);
   const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const fetchedNotes = await fetchNotes();
+      setNotes(fetchedNotes);
+    } catch (error) {
+      console.error("Error refreshing notes:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   // Fetch notes when component mounts
   useEffect(() => {
@@ -169,7 +183,17 @@ const HomeScreen = () => {
         ))}
       </ScrollView>
 
-      <ScrollView style={styles.notesList}>
+      <ScrollView
+        style={styles.notesList}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["rgb(69, 129, 240)"]} // Android
+            tintColor="rgb(69, 129, 240)" // iOS
+          />
+        }
+      >
         {loading ? (
           <Text style={styles.loadingText}>Loading notes...</Text>
         ) : getFilteredNotes().length > 0 ? (

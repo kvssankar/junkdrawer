@@ -260,7 +260,7 @@ const NoteDetailView = () => {
           <View style={styles.reminderContainer}>
             <MaterialCommunityIcons name="bell" size={20} color="#555" />
             <Text style={styles.reminderText}>
-              {moment(note.reminder_datetime).format("MMM D, YYYY · h:mm A")}
+              {moment(new Date(note.reminder_datetime)).format("MMM D, YYYY")}
             </Text>
           </View>
         )}

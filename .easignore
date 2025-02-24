@@ -1,0 +1,60 @@
+# Node modules and dependencies
+node_modules/
+bower_components/
+package-lock.json
+yarn.lock
+.pnpm-debug.log
+.npm/
+.pnp/
+.pnp.js
+
+# Build and output files
+*.log
+*.tmp
+*.swp
+dist/
+build/
+.cache/
+.expo/
+.expo-shared/
+web-build/
+android/app/build/
+ios/build/
+ios/Pods/
+ios/Podfile.lock
+android/.gradle/
+android/.idea/
+android/local.properties
+
+# IDE and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+# Expo and EAS-specific files
+.expo/
+.expo-shared/
+.expo-internal/
+.expo-private/
+.expo-settings.json
+
+# Environment variables and secrets
+.env
+.env.*
+*.keystore
+*.p12
+*.pem
+google-services.json
+firebase.json
+app.json.backup
+
+# Metro Bundler cache
+metro-cache/
+react-native-packager-cache/
+
+# EAS Build cache
+.eas/build/

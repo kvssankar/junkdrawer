@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import LoaderKit from "react-native-loader-kit";
 import { useRouter } from "expo-router";
+import { chat } from "@/services/notes";
 
 const getRandId = () => Math.floor(Math.random() * 1000);
 
@@ -24,7 +25,7 @@ const ChatScreen: React.FC = ({ navigation }) => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const user = { id: "06c33e8b-e835-4736-80f4-63f44b66666c" };
+  const user = { id: "user" };
 
   const TypingIndicator = () => (
     <View style={styles.typingContainer}>
@@ -52,7 +53,7 @@ const ChatScreen: React.FC = ({ navigation }) => {
     );
   };
 
-  const handleSendPress = (message: MessageType.PartialText) => {
+  const handleSendPress = async (message: MessageType.PartialText) => {
     const textMessage: MessageType.Text = {
       author: user,
       createdAt: Date.now(),
@@ -63,17 +64,16 @@ const ChatScreen: React.FC = ({ navigation }) => {
     setMessages([textMessage, ...messages]);
     setIsLoading(true);
 
-    setTimeout(() => {
-      const assistantMessage: MessageType.Text = {
-        author: assistant,
-        createdAt: Date.now(),
-        id: getRandId(),
-        text: "Hello World",
-        type: "text",
-      };
-      setMessages((prevMessages) => [assistantMessage, ...prevMessages]);
-      setIsLoading(false);
-    }, 3000);
+    const assMssg = await chat(messages);
+    const assistantMessage: MessageType.Text = {
+      author: assistant,
+      createdAt: Date.now(),
+      id: getRandId(),
+      text: assMssg.answer,
+      type: "text",
+    };
+    setMessages((prevMessages) => [assistantMessage, ...prevMessages]);
+    setIsLoading(false);
   };
 
   return (
@@ -96,6 +96,7 @@ const ChatScreen: React.FC = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    fontFamily: "Poppins_400Regular",
   },
   header: {
     height: 60,

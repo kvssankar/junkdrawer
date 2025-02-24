@@ -1,4 +1,4 @@
-package com.anonymous.jarvis
+package com.kvssankar.messynotes
 
 import android.app.Application
 import android.content.res.Configuration

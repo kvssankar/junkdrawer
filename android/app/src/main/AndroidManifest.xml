@@ -28,8 +28,8 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
-        <data android:scheme="com.anonymous.jarvis"/>
-        <data android:scheme="exp+jarvis"/>
+        <data android:scheme="com.kvssankar.messynotes"/>
+        <data android:scheme="exp+messynotes"/>
       </intent-filter>
     </activity>
   </application>

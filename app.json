@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "jarvis",
-    "slug": "jarvis",
+    "name": "messynotes",
+    "slug": "messynotes",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -16,8 +16,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.jarvis",
-      "permissions": ["CAMERA", "RECORD_AUDIO"]
+      "package": "com.kvssankar.messynotes",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -51,7 +54,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "98b2ece9-6971-4369-b933-d1426709682e"
+        "projectId": "652018d3-f14d-4773-9873-a6325a29db82"
       }
     },
     "owner": "kvssankar"

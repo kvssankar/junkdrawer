@@ -1,4 +1,4 @@
-package com.anonymous.jarvis
+package com.kvssankar.messynotes
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

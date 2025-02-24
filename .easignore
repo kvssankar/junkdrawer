@@ -18,13 +18,8 @@ build/
 .expo/
 .expo-shared/
 web-build/
-android/app/build/
-ios/build/
-ios/Pods/
-ios/Podfile.lock
-android/.gradle/
-android/.idea/
-android/local.properties
+ios/
+android/
 
 # IDE and system files
 .vscode/

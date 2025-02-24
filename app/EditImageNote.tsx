@@ -32,17 +32,21 @@ const EditImageNote = () => {
       : undefined
   );
 
-  const handleSave = () => {
+  const [updateLoading, setUpdateLoading] = useState(false);
+
+  const handleSave = async () => {
     const updatedNote = {
-      ...noteData,
+      createdAt: new Date(),
       title,
       content,
       tags,
       reminder_datetime: reminderDate?.toISOString(),
     };
-    console.log("Saving note:", updatedNote);
+    setUpdateLoading(true);
+    await updatedNote(noteData._id, updatedNote);
+    setUpdateLoading(false);
     // Implement your API call here to save the note
-    router.back();
+    router.push("/Dashboard");
   };
 
   const handleAddTag = () => {
@@ -166,7 +170,7 @@ const EditImageNote = () => {
           onPress={handleSave}
           style={styles.footerButton}
         >
-          Save
+          {updateLoading ? "Saving..." : "Save"}
         </Button>
         <Button
           mode="outlined"

@@ -202,7 +202,7 @@ const NoteCard = ({ note }) => {
         });
       }}
     >
-      <View style={styles.titleContainer}>
+     {note.title !== "Processing..." && <View style={styles.titleContainer}>
         {renderNoteIcon()}
         <View style={styles.titleTextContainer}>
           <Text style={styles.cardTitle}>{note.title}</Text>
@@ -210,7 +210,7 @@ const NoteCard = ({ note }) => {
             {moment(note.createdAt).calendar()}
           </Text>
         </View>
-      </View>
+      </View>}
       <Card.Content>
         {note.type === "voice" && (
           <View style={styles.audioPlayerContainer}>

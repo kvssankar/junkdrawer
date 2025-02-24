@@ -13,6 +13,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
+import { deleteNote } from "@/services/notes";
 
 const NoteDetailView = () => {
   const router = useRouter();
@@ -137,11 +138,15 @@ const NoteDetailView = () => {
     }
   };
 
-  const handleDelete = () => {
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const handleDelete = async () => {
     // Implement delete logic here
-    console.log("Delete note with id:", note?._id);
+    setDeleteLoading(true);
+    await deleteNote(note._id);
+    setDeleteLoading(false);
     // After deletion, go back
-    router.back();
+    router.push("/Dashboard");
   };
 
   const handleImagePress = (image) => {
@@ -286,7 +291,7 @@ const NoteDetailView = () => {
           style={styles.deleteButton}
           buttonColor="#ff5252"
         >
-          Delete
+          {deleteLoading ? "Deleting..." : "Delete"}
         </Button>
       </View>
 

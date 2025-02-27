@@ -9,7 +9,18 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["myapp"]
+          }
+        ],
+        "NSCameraUsageDescription": "This app needs access to camera to take photos for notes",
+        "NSMicrophoneUsageDescription": "This app needs access to microphone for voice notes",
+        "NSPhotoLibraryUsageDescription": "This app needs access to photos to save captured images",
+        "LSApplicationQueriesSchemes": ["myapp"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,9 +28,17 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.kvssankar.messynotes",
-      "permissions": [
-        "CAMERA",
-        "RECORD_AUDIO"
+      "permissions": ["CAMERA", "RECORD_AUDIO"],
+      "intentFilters": [
+        {
+          "action": "SEND",
+          "category": ["DEFAULT"],
+          "data": [
+            {
+              "mimeType": "text/plain"
+            }
+          ]
+        }
       ]
     },
     "web": {
